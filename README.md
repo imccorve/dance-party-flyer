@@ -1,3 +1,14 @@
+# Running
+
+To make sure there aren't any conflicts with the dependencies we can create a venv environment here:
+`python3 -m venv ml4a_env`
+`source ml4a_env/bin/activate  # On Windows: ml4a_env\Scripts\activ`
+
+# to exit >
+`deactivate`
+
+Need to run in a terminal twice before the screen pops up with '--device 0' (may need to switch device num)
+
 # hand-gesture-recognition-using-mediapipe
 Estimate hand pose using MediaPipe (Python version).<br> This is a sample 
 program that recognizes hand signs and finger gestures with a simple MLP using the detected key points.

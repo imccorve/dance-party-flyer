@@ -10,6 +10,7 @@ from collections import deque
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
+from gesture_tcp_client import send_gesture_data
 
 from utils import CvFpsCalc
 from model import KeyPointClassifier
@@ -61,7 +62,7 @@ def main():
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(
         static_image_mode=use_static_image_mode,
-        max_num_hands=1,
+        max_num_hands=2,
         min_detection_confidence=min_detection_confidence,
         min_tracking_confidence=min_tracking_confidence,
     )
@@ -98,6 +99,9 @@ def main():
     #  ########################################################################
     mode = 0
 
+    # Initialize the last hand sign id as None
+    last_hand_sign_id = None
+
     while True:
         fps = cvFpsCalc.get()
 
@@ -130,6 +134,8 @@ def main():
                 # Landmark calculation
                 landmark_list = calc_landmark_list(debug_image, hand_landmarks)
 
+                # print(landmark_list) # could be useful to piping to touchdesigner
+
                 # Conversion to relative coordinates / normalized coordinates
                 pre_processed_landmark_list = pre_process_landmark(
                     landmark_list)
@@ -141,6 +147,14 @@ def main():
 
                 # Hand sign classification
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
+                print(hand_sign_id)
+
+                # Check if hand_sign_id has changed
+                if hand_sign_id != last_hand_sign_id:
+                    send_gesture_data(hand_sign_id)
+                    last_hand_sign_id = hand_sign_id
+
+
                 if hand_sign_id == 2:  # Point gesture
                     point_history.append(landmark_list[8])
                 else:
